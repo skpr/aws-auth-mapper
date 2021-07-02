@@ -1,7 +1,7 @@
 package mapuser
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform/helper/schema"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	iamauthenticatorv1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"

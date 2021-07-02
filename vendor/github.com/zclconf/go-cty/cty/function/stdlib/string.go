@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/apparentlymart/go-textseg/v13/textseg"
+	"github.com/apparentlymart/go-textseg/v12/textseg"
 
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
@@ -150,6 +150,7 @@ var SubstrFunc = function.New(&function.Spec{
 			// be the empty string
 			return cty.StringVal(""), nil
 		}
+
 
 		sub := in
 		pos := 0
