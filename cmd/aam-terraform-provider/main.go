@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/plugin"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 
 	"github.com/skpr/aws-auth-mapper/internal/terraform/provider/aam/iamauthenticator/maprole"
 	"github.com/skpr/aws-auth-mapper/internal/terraform/provider/aam/iamauthenticator/mapuser"
@@ -19,7 +18,7 @@ const (
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: func() terraform.ResourceProvider {
+		ProviderFunc: func() *schema.Provider {
 			return &schema.Provider{
 				Schema: config.Fields(),
 				ResourcesMap: map[string]*schema.Resource{

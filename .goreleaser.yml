@@ -1,0 +1,42 @@
+project_name: aws-auth-mapper
+
+builds:
+  - id: aam-controller
+    main: ./cmd/aam-controller
+    binary: aam-controller
+    ldflags:
+      - -extldflags '-static'
+    env:
+      - CGO_ENABLED=0
+    goos: [ linux ]
+    goarch: [ amd64 ]
+
+  - id: aam-terraform-provider
+    main: ./cmd/aam-terraform-provider
+    binary: aam-terraform-provider
+    ldflags:
+      - -extldflags '-static'
+    env:
+      - CGO_ENABLED=0
+    goos: [ linux ]
+    goarch: [ amd64 ]
+
+release:
+  prerelease: auto
+  name_template: "AWS Auth Mapper {{.Version}}"
+
+  github:
+    owner: skpr
+    name: aws-auth-mapper
+
+dockers:
+  - binaries:
+      - aam-controller
+    builds:
+      - aam-controller
+    image_templates:
+      - skpr/aws-auth-mapper:latest
+      - skpr/aws-auth-mapper:{{ .Tag }}
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"

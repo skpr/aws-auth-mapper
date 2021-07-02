@@ -8,10 +8,9 @@ all: test build
 test: generate fmt vet manifests
 	go test ./... -coverprofile cover.out
 
-# Build the project
-build:
-	# gox -os='linux' -arch='amd64' -output='bin/{{.Arch}}/{{.OS}}/skpr-operator' -ldflags=${LGFLAGS} github.com/skpr/skpr/cmd/skpr-operator
-	# gox -os='linux' -arch='amd64' -output='bin/{{.Arch}}/{{.OS}}/skpr-terraform-provider' -ldflags=${LGFLAGS} github.com/skpr/skpr/cmd/skpr-terraform-provider
+# Perform a test package
+dry-run:
+	goreleaser --snapshot --skip-publish --rm-dist
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests:
