@@ -37,9 +37,11 @@ func Resource() *schema.Resource {
 				Required: true,
 			},
 			FieldGroups: {
-				Elem:     schema.TypeList,
-				Type:     schema.TypeString,
+				Type:     schema.TypeList,
 				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 		},
 	}

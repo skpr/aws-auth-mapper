@@ -12,8 +12,8 @@ builds:
     goarch: [ amd64 ]
 
   - id: aam-terraform-provider
-    main: ./cmd/aam-terraform-provider
-    binary: aam-terraform-provider
+    main: ./cmd/terraform-provider-aws-auth-mapper
+    binary: terraform-provider-aws-auth-mapper
     ldflags:
       - -extldflags '-static'
     env:
