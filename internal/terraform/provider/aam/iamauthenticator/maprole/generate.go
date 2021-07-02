@@ -16,8 +16,13 @@ func Generate(d *schema.ResourceData) (iamauthenticatorv1beta1.MapRole, error) {
 		Spec: iamauthenticatorv1beta1.MapRoleSpec{
 			RoleARN:  d.Get(FieldRoleARN).(string),
 			Username: d.Get(FieldUsername).(string),
-			Groups:   d.Get(FieldGroups).([]string),
 		},
+	}
+
+	groups := d.Get(FieldGroups).([]interface{})
+
+	for _, group := range groups {
+		mapRole.Spec.Groups = append(mapRole.Spec.Groups, group.(string))
 	}
 
 	return mapRole, nil

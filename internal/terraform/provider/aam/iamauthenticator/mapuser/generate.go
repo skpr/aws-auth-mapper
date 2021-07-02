@@ -9,6 +9,7 @@ import (
 
 // Generate the MapRole resource.
 func Generate(d *schema.ResourceData) (iamauthenticatorv1beta1.MapUser, error) {
+
 	mapUser := iamauthenticatorv1beta1.MapUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: d.Get(FieldName).(string),
@@ -16,8 +17,13 @@ func Generate(d *schema.ResourceData) (iamauthenticatorv1beta1.MapUser, error) {
 		Spec: iamauthenticatorv1beta1.MapUserSpec{
 			UserARN:  d.Get(FieldUserARN).(string),
 			Username: d.Get(FieldUsername).(string),
-			Groups:   d.Get(FieldGroups).([]string),
 		},
+	}
+
+	groups := d.Get(FieldGroups).([]interface{})
+
+	for _, group := range groups {
+		mapUser.Spec.Groups = append(mapUser.Spec.Groups, group.(string))
 	}
 
 	return mapUser, nil
