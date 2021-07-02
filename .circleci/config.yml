@@ -1,0 +1,49 @@
+version: 2
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - lint
+      - test
+  release:
+    jobs:
+      - release:
+          context: org-global
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              # Only on tags formatted like v0.1.1
+              only: /^v\d+\.\d+\.\d+[0-9A-Za-z-]*$/
+
+jobs:
+  lint:
+    docker:
+      - image: skpr/kubebuilder:v2
+    working_directory: /go/src/github.com/skpr/aws-auth-mapper
+    steps:
+      - checkout
+      - run: |
+          go get golang.org/x/lint/golint
+          make lint vet fmt
+
+  test:
+    docker:
+      - image: skpr/kubebuilder:v2
+    working_directory: /go/src/github.com/skpr/aws-auth-mapper
+    steps:
+      - checkout
+      - run: |
+          go get golang.org/x/lint/golint
+          make lint vet fmt
+
+  release:
+    docker:
+      - image: docker.io/skpr/goreleaser:latest
+    working_directory: /go/src/github.com/skpr/aws-auth-mapper
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run: goreleaser
