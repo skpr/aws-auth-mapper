@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -14,6 +15,13 @@ import (
 	iamauthenticatorcmaprole "github.com/skpr/aws-auth-mapper/controllers/iamauthenticator/maprole"
 	iamauthenticatorcmapuser "github.com/skpr/aws-auth-mapper/controllers/iamauthenticator/mapuser"
 	// +kubebuilder:scaffold:imports
+)
+
+const (
+	// ConfigMapNamespace which will be updated.
+	ConfigMapNamespace = "kube-system"
+	// ConfigMapName which will be updated.
+	ConfigMapName = "aws-auth"
 )
 
 var (
@@ -59,6 +67,10 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("MapUser"),
 		Scheme: mgr.GetScheme(),
+		ConfigMap: types.NamespacedName{
+			Namespace: ConfigMapNamespace,
+			Name:           ConfigMapName,
+		},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MapUser")
 		os.Exit(1)
@@ -68,6 +80,10 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("MapRole"),
 		Scheme: mgr.GetScheme(),
+		ConfigMap: types.NamespacedName{
+			Namespace: ConfigMapNamespace,
+			Name:      ConfigMapName,
+		},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MapRole")
 		os.Exit(1)
