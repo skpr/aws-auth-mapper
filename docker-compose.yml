@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  server:
+    container_name: server
+    image: rancher/k3s:latest
+    command: |
+      server --node-name=server \
+             --no-deploy=traefik \
+             --no-deploy=servicelb \
+             --no-deploy=local-storage
+    privileged: true
+    ports:
+      - "6443:6443"
+    environment:
+      - K3S_TOKEN=skpr
+      - K3S_KUBECONFIG_OUTPUT=/output/config
+      - K3S_KUBECONFIG_MODE=666
+    tmpfs:
+      - /run
+      - /var/run
+    volumes:
+      - ./.kube:/output
+
+  kubebuilder:
+    image: skpr/kubebuilder:v2
+    network_mode: service:server
+    working_dir: /go/src/github.com/skpr/aws-auth-mapper
+    environment:
+      - KUBECONFIG=/go/src/github.com/skpr/aws-auth-mapper/.kube/config
+    volumes:
+      - .:/go/src/github.com/skpr/aws-auth-mapper
+      - go_pkg_mod:/go/pkg/mod
+
+volumes:
+  go_pkg_mod: {}

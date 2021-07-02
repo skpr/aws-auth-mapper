@@ -1,0 +1,10 @@
+apiVersion: iamauthenticator.skpr.io/v1beta1
+kind: MapRole
+metadata:
+  name: node
+spec:
+  roleARN:  arn:aws:iam::xxxyyyzzz:role/node
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+    - system:bootstrappers
+    - system:nodes

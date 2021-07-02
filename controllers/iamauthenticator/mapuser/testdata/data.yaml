@@ -1,0 +1,8 @@
+- userarn: arn:aws:iam::xxxxxxxxx:user/admin1
+  username: cluster-admin
+  groups:
+  - system:masters
+- userarn: arn:aws:iam::xxxxxxxxx:user/admin2
+  username: cluster-admin
+  groups:
+  - system:masters

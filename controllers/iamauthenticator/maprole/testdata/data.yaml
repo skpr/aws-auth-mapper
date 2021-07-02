@@ -1,0 +1,9 @@
+- rolearn: arn:aws:iam::xxxxxxxxx:role/node
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+  - system:bootstrappers
+  - system:nodes
+- rolearn: arn:aws:iam::xxxxxxxxx:role/admin
+  username: cluster-admin
+  groups:
+  - system:masters

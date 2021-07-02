@@ -1,0 +1,48 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - iamauthenticator.skpr.io
+  resources:
+  - maproles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - iamauthenticator.skpr.io
+  resources:
+  - maproles/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - iamauthenticator.skpr.io
+  resources:
+  - mapusers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - iamauthenticator.skpr.io
+  resources:
+  - mapusers/status
+  verbs:
+  - get
+  - patch
+  - update

@@ -1,0 +1,11 @@
+domain: skpr.io
+multigroup: true
+repo: github.com/skpr/aws-auth-mapper
+resources:
+- group: iamauthenticator
+  kind: MapUser
+  version: v1beta1
+- group: iamauthenticator
+  kind: MapRole
+  version: v1beta1
+version: "2"
