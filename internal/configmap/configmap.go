@@ -17,11 +17,11 @@ func UpdateDataWithKey(ctx context.Context, client client.Client, query types.Na
 		return fmt.Errorf("failed to get ConfigMap: %w", err)
 	}
 
-	if len(configmap.BinaryData) == 0 {
-		configmap.BinaryData = make(map[string][]byte)
+	if len(configmap.Data) == 0 {
+		configmap.Data = make(map[string]string)
 	}
 
-	configmap.BinaryData[key] = data
+	configmap.Data[key] = string(data)
 
 	if err := client.Update(ctx, configmap); err != nil {
 		return fmt.Errorf("failed to update ConfigMap: %w", err)
