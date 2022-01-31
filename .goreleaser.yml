@@ -30,13 +30,18 @@ release:
     name: aws-auth-mapper
 
 dockers:
-  - binaries:
-      - aam-controller
-    builds:
-      - aam-controller
-    image_templates:
+  - image_templates:
       - skpr/aws-auth-mapper:latest
+      - skpr/aws-auth-mapper:controller-latest
       - skpr/aws-auth-mapper:{{ .Tag }}
-    dockerfile: Dockerfile
+      - skpr/aws-auth-mapper:controller-{{ .Tag }}
+    dockerfile: dockerfiles/controller/Dockerfile
+    build_flag_templates:
+      - "--pull"
+
+  - image_templates:
+      - skpr/aws-auth-mapper:terraform-latest
+      - skpr/aws-auth-mapper:terraform-{{ .Tag }}
+    dockerfile: dockerfiles/terraform/Dockerfile
     build_flag_templates:
       - "--pull"
