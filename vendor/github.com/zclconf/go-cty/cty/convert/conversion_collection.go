@@ -156,45 +156,34 @@ func conversionCollectionToMap(ety cty.Type, conv conversion) conversion {
 // given tuple type and return a set of the given element type.
 //
 // Will panic if the given tupleType isn't actually a tuple type.
-func conversionTupleToSet(tupleType cty.Type, setEty cty.Type, unsafe bool) conversion {
+func conversionTupleToSet(tupleType cty.Type, listEty cty.Type, unsafe bool) conversion {
 	tupleEtys := tupleType.TupleElementTypes()
 
 	if len(tupleEtys) == 0 {
 		// Empty tuple short-circuit
 		return func(val cty.Value, path cty.Path) (cty.Value, error) {
-			return cty.SetValEmpty(setEty), nil
+			return cty.SetValEmpty(listEty), nil
 		}
 	}
 
-	if setEty == cty.DynamicPseudoType {
+	if listEty == cty.DynamicPseudoType {
 		// This is a special case where the caller wants us to find
 		// a suitable single type that all elements can convert to, if
 		// possible.
-		setEty, _ = unify(tupleEtys, unsafe)
-		if setEty == cty.NilType {
+		listEty, _ = unify(tupleEtys, unsafe)
+		if listEty == cty.NilType {
 			return nil
-		}
-
-		// If the set element type after unification is still the dynamic
-		// type, the only way this can result in a valid set is if all values
-		// are of dynamic type
-		if setEty == cty.DynamicPseudoType {
-			for _, tupleEty := range tupleEtys {
-				if !tupleEty.Equals(cty.DynamicPseudoType) {
-					return nil
-				}
-			}
 		}
 	}
 
 	elemConvs := make([]conversion, len(tupleEtys))
 	for i, tupleEty := range tupleEtys {
-		if tupleEty.Equals(setEty) {
+		if tupleEty.Equals(listEty) {
 			// no conversion required
 			continue
 		}
 
-		elemConvs[i] = getConversion(tupleEty, setEty, unsafe)
+		elemConvs[i] = getConversion(tupleEty, listEty, unsafe)
 		if elemConvs[i] == nil {
 			// If any of our element conversions are impossible, then the our
 			// whole conversion is impossible.
@@ -254,17 +243,6 @@ func conversionTupleToList(tupleType cty.Type, listEty cty.Type, unsafe bool) co
 		listEty, _ = unify(tupleEtys, unsafe)
 		if listEty == cty.NilType {
 			return nil
-		}
-
-		// If the list element type after unification is still the dynamic
-		// type, the only way this can result in a valid list is if all values
-		// are of dynamic type
-		if listEty == cty.DynamicPseudoType {
-			for _, tupleEty := range tupleEtys {
-				if !tupleEty.Equals(cty.DynamicPseudoType) {
-					return nil
-				}
-			}
 		}
 	}
 
