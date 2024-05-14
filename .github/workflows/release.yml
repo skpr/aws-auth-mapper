@@ -1,0 +1,36 @@
+name: ☁️ Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+[0-9A-Za-z]?'
+
+env:
+  DOCKER_USER: ${{ secrets.DOCKER_USER }}
+  DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: 📦 Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.21'
+
+      - name: 🔐 Log in to Registries
+        run: |
+          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
+      - name: 📦 Install GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          install-only: true
+
+      - name: ☁️ GoReleaser
+        run: |
+          goreleaser
