@@ -2,6 +2,7 @@ version: 2
 
 builds:
   - id: terraform-provider-aws-auth-mapper
+    binary: terraform-provider-aws-auth-mapper
     main: ./cmd/terraform-provider-aws-auth-mapper
     env: [ CGO_ENABLED=0 ]
     goos: [ linux, darwin ]
