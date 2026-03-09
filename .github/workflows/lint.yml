@@ -1,0 +1,29 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: 📋 Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Git clone the repository
+        uses: actions/checkout@v5
+
+      - name: 📦 Install Mise
+        run: |
+          curl https://mise.run | sh
+          mise install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧪 Lint
+        run: |
+          mise run lint
