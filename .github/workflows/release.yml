@@ -1,37 +1,38 @@
-name: ☁️ Release
+name: Create and publish a Github Package
 
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+[0-9A-Za-z]?'
+      - 'v*'
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
       - name: ⬇️ Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: 📦 Install Go
-        uses: actions/setup-go@v5
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
         with:
-          go-version-file: 'go.mod'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📦 Install dependencies
-        run: go mod vendor
-
-      - name: 📦 Install GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          install-only: true
-
-      - name: ☁️ GoReleaser
+      - name: 📦 Install Mise
         run: |
-          goreleaser
+          curl https://mise.run | sh
+          mise install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧪 Release
+        run: |
+          mise run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
