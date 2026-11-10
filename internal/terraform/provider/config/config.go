@@ -31,7 +31,7 @@ func Func(d *schema.ResourceData) (interface{}, error) {
 	cfg := &rest.Config{}
 
 	// Overriding with static configuration
-	cfg.UserAgent = fmt.Sprintf("HashiCorp/1.0 Terraform")
+	cfg.UserAgent = "HashiCorp/1.0 Terraform"
 
 	if v, ok := d.GetOk(FieldHost); ok {
 		cfg.Host = v.(string)

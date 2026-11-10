@@ -3,6 +3,7 @@ package eks
 import (
 	"context"
 	"encoding/base64"
+
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 

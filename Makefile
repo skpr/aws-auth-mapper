@@ -24,10 +24,6 @@ fmt:
 vet:
 	go vet ./...
 
-# Run golint against code
-lint:
-	golint -set_exit_status `go list ./... | grep -v /vendor/`
-
 # Generate code
 generate:
 	controller-gen object:headerFile=./hack/boilerplate.go.txt paths="./..."

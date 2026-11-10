@@ -2,7 +2,7 @@ package mapuser
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake" //nolint:staticcheck // Migrating to envtest is out of scope.
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	iamauthenticatorv1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"
@@ -64,22 +64,22 @@ func TestReconcile(t *testing.T) {
 		Log:    ctrl.Log,
 		Scheme: scheme,
 		ConfigMap: types.NamespacedName{
-			Namespace: configmap.ObjectMeta.Namespace,
-			Name:      configmap.ObjectMeta.Name,
+			Namespace: configmap.Namespace,
+			Name:      configmap.Name,
 		},
 	}
 
 	_, err = reconciler.Reconcile(reconcile.Request{
 		NamespacedName: types.NamespacedName{
-			Name: admin1.ObjectMeta.Name,
+			Name: admin1.Name,
 		},
 	})
 	assert.Nil(t, err)
 
-	err = reconciler.Client.Get(context.TODO(), reconciler.ConfigMap, configmap)
+	err = reconciler.Get(context.TODO(), reconciler.ConfigMap, configmap)
 	assert.Nil(t, err)
 
-	expected, err := ioutil.ReadFile("./testdata/data.yaml")
+	expected, err := os.ReadFile("./testdata/data.yaml")
 	assert.Nil(t, err)
 
 	assert.NotEmpty(t, configmap.BinaryData)

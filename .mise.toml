@@ -1,0 +1,10 @@
+[tools]
+go = "1.24"
+"ubi:golangci/golangci-lint" = "2.10"
+
+[env]
+CGO_ENABLED=0
+
+[tasks.lint]
+description = "Linting automatically checks code for errors and style issues"
+run = "golangci-lint run"

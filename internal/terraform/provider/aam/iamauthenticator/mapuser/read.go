@@ -22,7 +22,7 @@ func Read(d *schema.ResourceData, m interface{}) error {
 		return errors.Wrap(err, "failed to get")
 	}
 
-	d.Set(FieldName, mapRole.ObjectMeta.Name)
+	d.Set(FieldName, mapRole.Name)
 	d.Set(FieldUserARN, mapRole.Spec.UserARN)
 	d.Set(FieldUsername, mapRole.Spec.Username)
 	d.Set(FieldGroups, mapRole.Spec.Groups)
