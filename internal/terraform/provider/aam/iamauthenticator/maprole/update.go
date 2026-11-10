@@ -17,7 +17,7 @@ func Update(d *schema.ResourceData, m interface{}) error {
 		return errors.Wrap(err, "failed to generate")
 	}
 
-	mapRole, err := conn.IamauthenticatorV1beta1().MapRoles().Get(p.ObjectMeta.Name, metav1.GetOptions{})
+	mapRole, err := conn.IamauthenticatorV1beta1().MapRoles().Get(p.Name, metav1.GetOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed get existing MapRole")
 	}

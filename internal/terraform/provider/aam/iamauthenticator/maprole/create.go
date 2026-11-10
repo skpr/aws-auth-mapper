@@ -21,7 +21,7 @@ func Create(d *schema.ResourceData, m interface{}) error {
 		return errors.Wrap(err, "failed to create")
 	}
 
-	d.SetId(out.ObjectMeta.Name)
+	d.SetId(out.Name)
 
 	return nil
 }

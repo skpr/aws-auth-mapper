@@ -14,7 +14,6 @@ import (
 	iamauthenticatorv1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"
 	iamauthenticatorcmaprole "github.com/skpr/aws-auth-mapper/controllers/iamauthenticator/maprole"
 	iamauthenticatorcmapuser "github.com/skpr/aws-auth-mapper/controllers/iamauthenticator/mapuser"
-	// +kubebuilder:scaffold:imports
 )
 
 const (
@@ -69,7 +68,7 @@ func main() {
 		Scheme: mgr.GetScheme(),
 		ConfigMap: types.NamespacedName{
 			Namespace: ConfigMapNamespace,
-			Name:           ConfigMapName,
+			Name:      ConfigMapName,
 		},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MapUser")
