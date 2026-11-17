@@ -34,7 +34,8 @@ generate:
 	client-gen --input-base=github.com/skpr/aws-auth-mapper/apis \
                --input="iamauthenticator/v1beta1" \
                --go-header-file=./hack/boilerplate.go.txt \
-               --output-package=github.com/skpr/aws-auth-mapper/internal/ \
+               --output-dir=internal \
+               --output-pkg=github.com/skpr/aws-auth-mapper/internal \
                --clientset-name=clientset
 
 .PHONY: *

@@ -1,4 +1,4 @@
-FROM hashicorp/terraform:1.1.1
+FROM hashicorp/terraform:1.17.2
 
 RUN mkdir -p /root/.terraform.d/plugins
 
