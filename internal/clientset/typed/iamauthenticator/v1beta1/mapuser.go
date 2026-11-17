@@ -18,14 +18,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	"time"
+	context "context"
 
-	v1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"
+	iamauthenticatorv1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"
 	scheme "github.com/skpr/aws-auth-mapper/internal/clientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
-	rest "k8s.io/client-go/rest"
+	gentype "k8s.io/client-go/gentype"
 )
 
 // MapUsersGetter has a method to return a MapUserInterface.
@@ -36,144 +36,34 @@ type MapUsersGetter interface {
 
 // MapUserInterface has methods to work with MapUser resources.
 type MapUserInterface interface {
-	Create(*v1beta1.MapUser) (*v1beta1.MapUser, error)
-	Update(*v1beta1.MapUser) (*v1beta1.MapUser, error)
-	UpdateStatus(*v1beta1.MapUser) (*v1beta1.MapUser, error)
-	Delete(name string, options *v1.DeleteOptions) error
-	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1beta1.MapUser, error)
-	List(opts v1.ListOptions) (*v1beta1.MapUserList, error)
-	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MapUser, err error)
+	Create(ctx context.Context, mapUser *iamauthenticatorv1beta1.MapUser, opts v1.CreateOptions) (*iamauthenticatorv1beta1.MapUser, error)
+	Update(ctx context.Context, mapUser *iamauthenticatorv1beta1.MapUser, opts v1.UpdateOptions) (*iamauthenticatorv1beta1.MapUser, error)
+	// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+	UpdateStatus(ctx context.Context, mapUser *iamauthenticatorv1beta1.MapUser, opts v1.UpdateOptions) (*iamauthenticatorv1beta1.MapUser, error)
+	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*iamauthenticatorv1beta1.MapUser, error)
+	List(ctx context.Context, opts v1.ListOptions) (*iamauthenticatorv1beta1.MapUserList, error)
+	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *iamauthenticatorv1beta1.MapUser, err error)
 	MapUserExpansion
 }
 
 // mapUsers implements MapUserInterface
 type mapUsers struct {
-	client rest.Interface
+	*gentype.ClientWithList[*iamauthenticatorv1beta1.MapUser, *iamauthenticatorv1beta1.MapUserList]
 }
 
 // newMapUsers returns a MapUsers
 func newMapUsers(c *IamauthenticatorV1beta1Client) *mapUsers {
 	return &mapUsers{
-		client: c.RESTClient(),
+		gentype.NewClientWithList[*iamauthenticatorv1beta1.MapUser, *iamauthenticatorv1beta1.MapUserList](
+			"mapusers",
+			c.RESTClient(),
+			scheme.ParameterCodec,
+			"",
+			func() *iamauthenticatorv1beta1.MapUser { return &iamauthenticatorv1beta1.MapUser{} },
+			func() *iamauthenticatorv1beta1.MapUserList { return &iamauthenticatorv1beta1.MapUserList{} },
+		),
 	}
-}
-
-// Get takes name of the mapUser, and returns the corresponding mapUser object, and an error if there is any.
-func (c *mapUsers) Get(name string, options v1.GetOptions) (result *v1beta1.MapUser, err error) {
-	result = &v1beta1.MapUser{}
-	err = c.client.Get().
-		Resource("mapusers").
-		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
-		Into(result)
-	return
-}
-
-// List takes label and field selectors, and returns the list of MapUsers that match those selectors.
-func (c *mapUsers) List(opts v1.ListOptions) (result *v1beta1.MapUserList, err error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	result = &v1beta1.MapUserList{}
-	err = c.client.Get().
-		Resource("mapusers").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Do().
-		Into(result)
-	return
-}
-
-// Watch returns a watch.Interface that watches the requested mapUsers.
-func (c *mapUsers) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	var timeout time.Duration
-	if opts.TimeoutSeconds != nil {
-		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
-	}
-	opts.Watch = true
-	return c.client.Get().
-		Resource("mapusers").
-		VersionedParams(&opts, scheme.ParameterCodec).
-		Timeout(timeout).
-		Watch()
-}
-
-// Create takes the representation of a mapUser and creates it.  Returns the server's representation of the mapUser, and an error, if there is any.
-func (c *mapUsers) Create(mapUser *v1beta1.MapUser) (result *v1beta1.MapUser, err error) {
-	result = &v1beta1.MapUser{}
-	err = c.client.Post().
-		Resource("mapusers").
-		Body(mapUser).
-		Do().
-		Into(result)
-	return
-}
-
-// Update takes the representation of a mapUser and updates it. Returns the server's representation of the mapUser, and an error, if there is any.
-func (c *mapUsers) Update(mapUser *v1beta1.MapUser) (result *v1beta1.MapUser, err error) {
-	result = &v1beta1.MapUser{}
-	err = c.client.Put().
-		Resource("mapusers").
-		Name(mapUser.Name).
-		Body(mapUser).
-		Do().
-		Into(result)
-	return
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *mapUsers) UpdateStatus(mapUser *v1beta1.MapUser) (result *v1beta1.MapUser, err error) {
-	result = &v1beta1.MapUser{}
-	err = c.client.Put().
-		Resource("mapusers").
-		Name(mapUser.Name).
-		SubResource("status").
-		Body(mapUser).
-		Do().
-		Into(result)
-	return
-}
-
-// Delete takes name of the mapUser and deletes it. Returns an error if one occurs.
-func (c *mapUsers) Delete(name string, options *v1.DeleteOptions) error {
-	return c.client.Delete().
-		Resource("mapusers").
-		Name(name).
-		Body(options).
-		Do().
-		Error()
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *mapUsers) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
-	}
-	return c.client.Delete().
-		Resource("mapusers").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
-		Timeout(timeout).
-		Body(options).
-		Do().
-		Error()
-}
-
-// Patch applies the patch and returns the patched mapUser.
-func (c *mapUsers) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MapUser, err error) {
-	result = &v1beta1.MapUser{}
-	err = c.client.Patch(pt).
-		Resource("mapusers").
-		SubResource(subresources...).
-		Name(name).
-		Body(data).
-		Do().
-		Into(result)
-	return
 }

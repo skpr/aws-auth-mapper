@@ -19,112 +19,31 @@ package fake
 
 import (
 	v1beta1 "github.com/skpr/aws-auth-mapper/apis/iamauthenticator/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	testing "k8s.io/client-go/testing"
+	iamauthenticatorv1beta1 "github.com/skpr/aws-auth-mapper/internal/clientset/typed/iamauthenticator/v1beta1"
+	gentype "k8s.io/client-go/gentype"
 )
 
-// FakeMapRoles implements MapRoleInterface
-type FakeMapRoles struct {
+// fakeMapRoles implements MapRoleInterface
+type fakeMapRoles struct {
+	*gentype.FakeClientWithList[*v1beta1.MapRole, *v1beta1.MapRoleList]
 	Fake *FakeIamauthenticatorV1beta1
 }
 
-var maprolesResource = schema.GroupVersionResource{Group: "iamauthenticator.skpr.io", Version: "v1beta1", Resource: "maproles"}
-
-var maprolesKind = schema.GroupVersionKind{Group: "iamauthenticator.skpr.io", Version: "v1beta1", Kind: "MapRole"}
-
-// Get takes name of the mapRole, and returns the corresponding mapRole object, and an error if there is any.
-func (c *FakeMapRoles) Get(name string, options v1.GetOptions) (result *v1beta1.MapRole, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(maprolesResource, name), &v1beta1.MapRole{})
-	if obj == nil {
-		return nil, err
+func newFakeMapRoles(fake *FakeIamauthenticatorV1beta1) iamauthenticatorv1beta1.MapRoleInterface {
+	return &fakeMapRoles{
+		gentype.NewFakeClientWithList[*v1beta1.MapRole, *v1beta1.MapRoleList](
+			fake.Fake,
+			"",
+			v1beta1.SchemeGroupVersion.WithResource("maproles"),
+			v1beta1.SchemeGroupVersion.WithKind("MapRole"),
+			func() *v1beta1.MapRole { return &v1beta1.MapRole{} },
+			func() *v1beta1.MapRoleList { return &v1beta1.MapRoleList{} },
+			func(dst, src *v1beta1.MapRoleList) { dst.ListMeta = src.ListMeta },
+			func(list *v1beta1.MapRoleList) []*v1beta1.MapRole { return gentype.ToPointerSlice(list.Items) },
+			func(list *v1beta1.MapRoleList, items []*v1beta1.MapRole) {
+				list.Items = gentype.FromPointerSlice(items)
+			},
+		),
+		fake,
 	}
-	return obj.(*v1beta1.MapRole), err
-}
-
-// List takes label and field selectors, and returns the list of MapRoles that match those selectors.
-func (c *FakeMapRoles) List(opts v1.ListOptions) (result *v1beta1.MapRoleList, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(maprolesResource, maprolesKind, opts), &v1beta1.MapRoleList{})
-	if obj == nil {
-		return nil, err
-	}
-
-	label, _, _ := testing.ExtractFromListOptions(opts)
-	if label == nil {
-		label = labels.Everything()
-	}
-	list := &v1beta1.MapRoleList{ListMeta: obj.(*v1beta1.MapRoleList).ListMeta}
-	for _, item := range obj.(*v1beta1.MapRoleList).Items {
-		if label.Matches(labels.Set(item.Labels)) {
-			list.Items = append(list.Items, item)
-		}
-	}
-	return list, err
-}
-
-// Watch returns a watch.Interface that watches the requested mapRoles.
-func (c *FakeMapRoles) Watch(opts v1.ListOptions) (watch.Interface, error) {
-	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(maprolesResource, opts))
-}
-
-// Create takes the representation of a mapRole and creates it.  Returns the server's representation of the mapRole, and an error, if there is any.
-func (c *FakeMapRoles) Create(mapRole *v1beta1.MapRole) (result *v1beta1.MapRole, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(maprolesResource, mapRole), &v1beta1.MapRole{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1beta1.MapRole), err
-}
-
-// Update takes the representation of a mapRole and updates it. Returns the server's representation of the mapRole, and an error, if there is any.
-func (c *FakeMapRoles) Update(mapRole *v1beta1.MapRole) (result *v1beta1.MapRole, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(maprolesResource, mapRole), &v1beta1.MapRole{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1beta1.MapRole), err
-}
-
-// UpdateStatus was generated because the type contains a Status member.
-// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeMapRoles) UpdateStatus(mapRole *v1beta1.MapRole) (*v1beta1.MapRole, error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(maprolesResource, "status", mapRole), &v1beta1.MapRole{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1beta1.MapRole), err
-}
-
-// Delete takes name of the mapRole and deletes it. Returns an error if one occurs.
-func (c *FakeMapRoles) Delete(name string, options *v1.DeleteOptions) error {
-	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteAction(maprolesResource, name), &v1beta1.MapRole{})
-	return err
-}
-
-// DeleteCollection deletes a collection of objects.
-func (c *FakeMapRoles) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(maprolesResource, listOptions)
-
-	_, err := c.Fake.Invokes(action, &v1beta1.MapRoleList{})
-	return err
-}
-
-// Patch applies the patch and returns the patched mapRole.
-func (c *FakeMapRoles) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.MapRole, err error) {
-	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(maprolesResource, name, pt, data, subresources...), &v1beta1.MapRole{})
-	if obj == nil {
-		return nil, err
-	}
-	return obj.(*v1beta1.MapRole), err
 }

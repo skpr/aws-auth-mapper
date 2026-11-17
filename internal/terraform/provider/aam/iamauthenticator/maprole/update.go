@@ -1,7 +1,10 @@
 package maprole
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -9,24 +12,24 @@ import (
 )
 
 // Update the MapRole resource.
-func Update(d *schema.ResourceData, m interface{}) error {
+func Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	conn := m.(*clientset.Clientset)
 
 	p, err := Generate(d)
 	if err != nil {
-		return errors.Wrap(err, "failed to generate")
+		return diag.FromErr(errors.Wrap(err, "failed to generate"))
 	}
 
-	mapRole, err := conn.IamauthenticatorV1beta1().MapRoles().Get(p.ObjectMeta.Name, metav1.GetOptions{})
+	mapRole, err := conn.IamauthenticatorV1beta1().MapRoles().Get(ctx, p.ObjectMeta.Name, metav1.GetOptions{})
 	if err != nil {
-		return errors.Wrap(err, "failed get existing MapRole")
+		return diag.FromErr(errors.Wrap(err, "failed get existing MapRole"))
 	}
 
 	mapRole.Spec = p.Spec
 
-	_, err = conn.IamauthenticatorV1beta1().MapRoles().Update(mapRole)
+	_, err = conn.IamauthenticatorV1beta1().MapRoles().Update(ctx, mapRole, metav1.UpdateOptions{})
 	if err != nil {
-		return errors.Wrap(err, "failed to update")
+		return diag.FromErr(errors.Wrap(err, "failed to update"))
 	}
 
 	return nil
