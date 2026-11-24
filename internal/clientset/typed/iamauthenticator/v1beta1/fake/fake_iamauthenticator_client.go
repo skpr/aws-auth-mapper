@@ -28,11 +28,11 @@ type FakeIamauthenticatorV1beta1 struct {
 }
 
 func (c *FakeIamauthenticatorV1beta1) MapRoles() v1beta1.MapRoleInterface {
-	return &FakeMapRoles{c}
+	return newFakeMapRoles(c)
 }
 
 func (c *FakeIamauthenticatorV1beta1) MapUsers() v1beta1.MapUserInterface {
-	return &FakeMapUsers{c}
+	return newFakeMapUsers(c)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -7,7 +7,8 @@ import (
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -18,14 +19,14 @@ import (
 
 // Func which configures the Kubernetes provider.
 // https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/kubernetes/provider.go
-func Func(d *schema.ResourceData) (interface{}, error) {
+func Func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	if v, ok := d.GetOk(FieldKubeConfig); ok {
 		cfg, err := clientcmd.BuildConfigFromFlags("", v.(string))
 		if err != nil {
-			return nil, err
+			return nil, diag.FromErr(err)
 		}
 
-		return clientset.NewForConfig(cfg)
+		return newClientset(cfg)
 	}
 
 	cfg := &rest.Config{}
@@ -60,21 +61,19 @@ func Func(d *schema.ResourceData) (interface{}, error) {
 			region = v.(string)
 		}
 
-		token, err := eksToken(region, cluster, profile)
+		token, err := eksToken(ctx, region, cluster, profile)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to EKS bearer token")
+			return nil, diag.FromErr(errors.Wrap(err, "failed to EKS bearer token"))
 		}
 
 		cfg.BearerToken = token
 	}
 
-	return clientset.NewForConfig(cfg)
+	return newClientset(cfg)
 }
 
 // Helper function to generate an EKS Kubernetes client.
-func eksToken(region, cluster, profile string) (string, error) {
-	ctx := context.TODO()
-
+func eksToken(ctx context.Context, region, cluster, profile string) (string, error) {
 	cfg, err := awsconfig.LoadDefaultConfig(ctx,
 		awsconfig.WithRegion(region),
 		awsconfig.WithSharedConfigProfile(profile),
@@ -99,4 +98,14 @@ func eksToken(region, cluster, profile string) (string, error) {
 	}
 
 	return token, nil
+}
+
+// Helper function to wrap clientset errors as Terraform diagnostics.
+func newClientset(cfg *rest.Config) (*clientset.Clientset, diag.Diagnostics) {
+	cs, err := clientset.NewForConfig(cfg)
+	if err != nil {
+		return nil, diag.FromErr(err)
+	}
+
+	return cs, nil
 }

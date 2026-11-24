@@ -2,7 +2,7 @@ package maprole
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -61,7 +61,7 @@ func TestReconcile(t *testing.T) {
 	}
 
 	reconciler := Reconciler{
-		Client: fake.NewFakeClientWithScheme(scheme, configmap, node, admin),
+		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(configmap, node, admin).Build(),
 		Log:    ctrl.Log,
 		Scheme: scheme,
 		ConfigMap: types.NamespacedName{
@@ -70,7 +70,7 @@ func TestReconcile(t *testing.T) {
 		},
 	}
 
-	_, err = reconciler.Reconcile(reconcile.Request{
+	_, err = reconciler.Reconcile(context.TODO(), reconcile.Request{
 		NamespacedName: types.NamespacedName{
 			Name: node.ObjectMeta.Name,
 		},
@@ -80,9 +80,9 @@ func TestReconcile(t *testing.T) {
 	err = reconciler.Client.Get(context.TODO(), reconciler.ConfigMap, configmap)
 	assert.Nil(t, err)
 
-	expected, err := ioutil.ReadFile("./testdata/data.yaml")
+	expected, err := os.ReadFile("./testdata/data.yaml")
 	assert.Nil(t, err)
 
-	assert.NotEmpty(t, configmap.BinaryData)
-	assert.Equal(t, string(expected), string(configmap.BinaryData[FieldName]))
+	assert.NotEmpty(t, configmap.Data)
+	assert.Equal(t, string(expected), configmap.Data[FieldName])
 }

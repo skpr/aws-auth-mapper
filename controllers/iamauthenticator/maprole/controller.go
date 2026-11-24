@@ -34,9 +34,7 @@ type Reconciler struct {
 // +kubebuilder:rbac:groups=iamauthenticator.skpr.io,resources=maproles,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=iamauthenticator.skpr.io,resources=maproles/status,verbs=get;update;patch
 
-func (r *Reconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
-
+func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("maprole", req.NamespacedName)
 
 	log.Info("Starting reconcile loop")
@@ -61,7 +59,7 @@ func (r *Reconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, fmt.Errorf("failed to marshal ConfigMap data")
 	}
 
-	if err := configmap.UpdateDataWithKey(ctx, r, r.ConfigMap, FieldName, data); err != nil {
+	if err := configmap.UpdateDataWithKey(ctx, r.Client, r.ConfigMap, FieldName, data); err != nil {
 		return ctrl.Result{}, err
 	}
 

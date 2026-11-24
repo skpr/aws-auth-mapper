@@ -22,3 +22,6 @@ share/
 
 # Terrraform
 .terraform/
+
+# Dependencies are not vendored
+/vendor
